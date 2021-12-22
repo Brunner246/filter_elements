@@ -23,16 +23,31 @@ import      tkinter.messagebox
 
 
 # global variables
-FIND_WORD  = uc.get_user_string("""Suchbegriff eingeben (z.B. Beton; Holz Lattung
+FIND_WORD  = uc.get_user_string("""Suchbegriff(e) eingeben (z.B. Beton, Holz, Lattung
                                 )""")
 
 #---------------------------------------------------------------
 
 def main():
     
-    element_ids = ec.get_active_identifiable_element_ids()
+    active_element_ids  = ec.get_active_identifiable_element_ids()
+    visible_element_ids = ec.get_visible_identifiable_element_ids()
+    
+    len_active_element_ids  = len(active_element_ids)
+    len_visible_element_ids = len(visible_element_ids)
+    
+    if len_active_element_ids != 0 and len_active_element_ids != len_visible_element_ids:
+        var :bool = uc.get_user_bool("Sollen nur aktive Elemente berücksichtigt werden?", True)
+        if var:
+            element_ids = active_element_ids
+        else:
+            element_ids = visible_element_ids
+    else:
+        element_ids = visible_element_ids
+    
     if len(element_ids) == 0:
-        warning_msg('Es sind keine Elemente aktiv!')
+        warning_msg('Es sind keine Elemente aktiv/sichtbar!')
+        exit()
  
     vc.set_inactive(element_ids)
     
@@ -46,7 +61,7 @@ def main():
     search = list(map(str.lower, search))
        
     for n, e in zip(names, element_ids):
-        if any(x in n for x in search):
+        if any(x in n for x in search): 
             elements.append(e)
         else:
             continue
@@ -83,3 +98,4 @@ def get_name(element:int) -> str:
 
 if __name__ == '__main__':
     main()
+    
